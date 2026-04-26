@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style type="text/css"><![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Lato:wght@300;400;600&display=swap');
+    ]]></style>
+    <filter id="og-rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="11"/>
+      <feDisplacementMap in="SourceGraphic" scale="1.5"/>
+    </filter>
+    <!-- Rim path in root SVG coords: seal center at (600, 240), rim at radius 100 -->
+    <path id="og-rim-top" d="M 500,240 A 100,100 0 0,1 700,240" fill="none"/>
+  </defs>
+
+  <!-- Parchment background -->
+  <rect width="1200" height="630" fill="#F5F0E8"/>
+
+  <!-- Master seal centered horizontally; seal viewBox 280x280 placed at (460..740, 100..380) so center is (600, 240) -->
+  <g transform="translate(460 100)">
+    <g filter="url(#og-rough)" transform="rotate(-3 140 140)">
+      <circle cx="140" cy="140" r="118" fill="none" stroke="#8B3A2E" stroke-width="1.6" opacity="0.85"/>
+      <circle cx="140" cy="140" r="105" fill="none" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6"  stroke-dasharray="5 3"/>
+      <circle cx="140" cy="140" r="89"  fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.5"  stroke-dasharray="2 2"/>
+      <circle cx="140" cy="140" r="73"  fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.4"  stroke-dasharray="3 4"/>
+
+      <line x1="140" y1="40"  x2="140" y2="56"  stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="140" y1="224" x2="140" y2="240" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="40"  y1="140" x2="56"  y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="224" y1="140" x2="240" y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="69"  y1="69"  x2="80"  y2="80"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
+      <line x1="200" y1="80"  x2="211" y2="69"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
+      <line x1="69"  y1="211" x2="80"  y2="200" stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
+      <line x1="200" y1="200" x2="211" y2="211" stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
+
+      <polygon points="140,57 165,63 187,80 204,103 213,131 211,160 198,184 178,202 152,212 124,210 99,200 78,182 64,156 60,128 67,101 84,79 107,65 134,58"
+               fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.5"/>
+
+      <circle cx="93"  cy="105" r="1.6" fill="#8B3A2E" opacity="0.45"/>
+      <circle cx="195" cy="98"  r="1.4" fill="#8B3A2E" opacity="0.4"/>
+      <circle cx="208" cy="170" r="1.6" fill="#8B3A2E" opacity="0.45"/>
+      <circle cx="118" cy="200" r="1.4" fill="#8B3A2E" opacity="0.4"/>
+    </g>
+    <text x="140" y="160" text-anchor="middle" fill="#8B3A2E" font-family="'Cormorant Garamond', Georgia, serif" font-size="68" font-style="italic" filter="url(#og-rough)" opacity="0.92">輪</text>
+  </g>
+
+  <!-- Top arc text — outside translated group so it follows the root-coord rim path -->
+  <text fill="#8B3A2E" font-family="'Lato', -apple-system, sans-serif" font-size="13" letter-spacing="5" font-weight="600" opacity="0.85">
+    <textPath href="#og-rim-top" startOffset="50%" text-anchor="middle">LOCAL  ·  CIRCLE</textPath>
+  </text>
+
+  <!-- Title -->
+  <text x="600" y="475" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif"
+        font-size="76"
+        font-weight="300"
+        fill="#2C241E">local circle</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="525" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="24"
+        font-weight="400"
+        font-style="italic"
+        fill="#6B5D50">small monthly walks in cities around the world</text>
+
+  <!-- Domain -->
+  <text x="600" y="585" text-anchor="middle"
+        font-family="'Lato', -apple-system, sans-serif"
+        font-size="12"
+        font-weight="300"
+        letter-spacing="0.4em"
+        fill="#8B3A2E">WALK.LC</text>
+</svg>

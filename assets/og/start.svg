@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style type="text/css"><![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Lato:wght@300;400;600&display=swap');
+    ]]></style>
+    <filter id="og-rough-start" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="23"/>
+      <feDisplacementMap in="SourceGraphic" scale="1.5"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="#F5F0E8"/>
+
+  <!-- Empty dashed circle — the "+ Your city?" idea, monumental -->
+  <g transform="translate(600 250)">
+    <circle cx="0" cy="0" r="118" fill="none" stroke="#8B3A2E" stroke-width="1.5" opacity="0.55" stroke-dasharray="6 6" filter="url(#og-rough-start)"/>
+    <circle cx="0" cy="0" r="100" fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.35" stroke-dasharray="3 4" filter="url(#og-rough-start)"/>
+    <text x="0" y="20" text-anchor="middle" fill="#8B3A2E" font-family="'Cormorant Garamond', Georgia, serif" font-size="76" font-weight="300" opacity="0.7">+</text>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="475" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="68"
+        font-weight="300"
+        fill="#2C241E">start a circle in your city</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="525" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="22"
+        font-weight="400"
+        font-style="italic"
+        fill="#6B5D50">a starter kit for would-be organizers</text>
+
+  <!-- Domain -->
+  <text x="600" y="585" text-anchor="middle"
+        font-family="'Lato', -apple-system, sans-serif"
+        font-size="12"
+        font-weight="300"
+        letter-spacing="0.4em"
+        fill="#8B3A2E">WALK.LC / START</text>
+</svg>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Light mode default -->
+  <style>
+    .ring { stroke: #8B3A2E; }
+    .ink  { fill:   #8B3A2E; }
+    @media (prefers-color-scheme: dark) {
+      .ring { stroke: #C8635A; }
+      .ink  { fill:   #C8635A; }
+    }
+  </style>
+
+  <!-- Two rings, no fancy turbulence (must read at 16px) -->
+  <circle class="ring" cx="32" cy="32" r="28" fill="none" stroke-width="3"/>
+  <circle class="ring" cx="32" cy="32" r="22" fill="none" stroke-width="1"/>
+
+  <!-- Centered 輪 in heavy weight for legibility at small sizes -->
+  <text class="ink" x="32" y="44" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, 'Hiragino Mincho ProN', 'Yu Mincho', serif"
+        font-size="36"
+        font-weight="600">輪</text>
+</svg>

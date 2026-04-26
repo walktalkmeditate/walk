@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style type="text/css"><![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Lato:wght@300;400;600&display=swap');
+    ]]></style>
+    <filter id="og-rough-austin" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="47"/>
+      <feDisplacementMap in="SourceGraphic" scale="1.5"/>
+    </filter>
+    <!-- Rim paths in root SVG coords: seal center at (600, 240), rim radius 100 -->
+    <path id="og-austin-rim-top" d="M 500,240 A 100,100 0 0,1 700,240" fill="none"/>
+    <path id="og-austin-rim-bot" d="M 700,248 A 100,100 0 0,1 500,248" fill="none"/>
+  </defs>
+
+  <rect width="1200" height="630" fill="#F5F0E8"/>
+
+  <!-- Austin city seal (viewBox 280x280) placed at (460..740, 100..380), center (600, 240) -->
+  <g transform="translate(460 100)">
+    <g filter="url(#og-rough-austin)" transform="rotate(7 140 140)">
+      <circle cx="140" cy="140" r="118" fill="none" stroke="#8B3A2E" stroke-width="1.6" opacity="0.85"/>
+      <circle cx="140" cy="140" r="105" fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.55" stroke-dasharray="3 3"/>
+      <circle cx="140" cy="140" r="88"  fill="none" stroke="#8B3A2E" stroke-width="0.9" opacity="0.55" stroke-dasharray="6 2"/>
+
+      <line x1="140" y1="40"  x2="140" y2="56"  stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="140" y1="224" x2="140" y2="240" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="40"  y1="140" x2="56"  y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="224" y1="140" x2="240" y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
+      <line x1="69"  y1="80"  x2="80"  y2="91"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
+      <line x1="200" y1="89"  x2="211" y2="78"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
+
+      <polygon points="140,72 175,78 205,98 215,128 200,160 165,180 130,185 95,175 72,150 70,118 88,92 115,78"
+               fill="none" stroke="#8B3A2E" stroke-width="0.8" opacity="0.55"/>
+
+      <circle cx="100" cy="115" r="1.6" fill="#8B3A2E" opacity="0.45"/>
+      <circle cx="190" cy="105" r="1.4" fill="#8B3A2E" opacity="0.4"/>
+      <circle cx="180" cy="170" r="1.4" fill="#8B3A2E" opacity="0.4"/>
+    </g>
+    <text x="140" y="160" text-anchor="middle" fill="#8B3A2E" font-family="'Cormorant Garamond', Georgia, serif" font-size="68" font-style="italic" filter="url(#og-rough-austin)" opacity="0.92">歩</text>
+  </g>
+
+  <!-- Arc texts — outside translated group, follow root-coord rim paths -->
+  <text fill="#8B3A2E" font-family="'Lato', -apple-system, sans-serif" font-size="13" letter-spacing="5" font-weight="600" opacity="0.85">
+    <textPath href="#og-austin-rim-top" startOffset="50%" text-anchor="middle">AUSTIN  ·  TEXAS</textPath>
+  </text>
+  <text fill="#8B3A2E" font-family="'Lato', -apple-system, sans-serif" font-size="9" letter-spacing="6" font-weight="500" opacity="0.7">
+    <textPath href="#og-austin-rim-bot" startOffset="50%" text-anchor="middle">FIRST SATURDAY</textPath>
+  </text>
+
+  <!-- Title -->
+  <text x="600" y="475" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="76"
+        font-weight="300"
+        fill="#2C241E">the austin circle</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="525" text-anchor="middle"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="22"
+        font-weight="400"
+        font-style="italic"
+        fill="#6B5D50">first saturday of every month, around lady bird lake</text>
+
+  <!-- Domain -->
+  <text x="600" y="585" text-anchor="middle"
+        font-family="'Lato', -apple-system, sans-serif"
+        font-size="12"
+        font-weight="300"
+        letter-spacing="0.4em"
+        fill="#8B3A2E">WALK.LC / AUSTIN</text>
+</svg>
