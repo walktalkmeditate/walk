@@ -116,8 +116,8 @@
 
     <section class="rule-block">
       <p class="rule">We walk on the first Saturday of every month.</p>
-      <p class="next">Next: Saturday, May 2 &mdash; 8:00 AM CT</p>
-      <p class="meta"><a href="/assets/austin-2026-05-02.ics" download>Add to calendar (.ics)</a></p>
+      <p class="next" data-cadence-next>Next: Saturday, May 2 &mdash; 8 AM CT</p>
+      <p class="meta"><a href="/assets/austin-2026-05-02.ics" download data-cadence-ics>Add to calendar (.ics)</a></p>
     </section>
 
     <section class="practical">
@@ -183,11 +183,17 @@
         [30.2683, -97.7570],
         [30.2715, -97.7548]
       ],
-      "cadence": { "pattern": "first-saturday", "time": "08:00", "tz": "America/Chicago" }
+      "cadence": { "pattern": "first-saturday", "time": "08:00", "tz": "America/Chicago" },
+      "where": {
+        "address": "Whole Foods Market, 525 N Lamar Blvd, Austin, TX",
+        "note": "second-floor patio"
+      },
+      "loopDescription": "Lady Bird Lake, ~3 miles, ~1.5 hours"
     }
   </script>
 
   <script src="/js/seal.js"></script>
+  <script src="/js/cadence.js"></script>
 
 </body>
 </html>
