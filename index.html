@@ -25,89 +25,10 @@
 </head>
 <body>
 
-  <!-- Inline SVG seal definitions. Static placeholders for v1; replaced by
-       js/seal.js procedural renderer in implementation step 2. -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <filter id="brushy" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="11"/>
-        <feDisplacementMap in="SourceGraphic" scale="1.5"/>
-      </filter>
-
-      <!-- Master seal: 輪 (circle/ring) at center, "LOCAL · CIRCLE" on top arc -->
-      <symbol id="seal-master" viewBox="0 0 280 280">
-        <g filter="url(#brushy)" transform="rotate(-3 140 140)">
-          <circle cx="140" cy="140" r="118" fill="none" stroke="#8B3A2E" stroke-width="1.6" opacity="0.85"/>
-          <circle cx="140" cy="140" r="108" fill="none" stroke="#8B3A2E" stroke-width="0.9" opacity="0.65"/>
-          <circle cx="140" cy="140" r="92"  fill="none" stroke="#8B3A2E" stroke-width="0.9" opacity="0.55" stroke-dasharray="5 3"/>
-          <circle cx="140" cy="140" r="74"  fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.45" stroke-dasharray="2 2"/>
-
-          <line x1="140" y1="40"  x2="140" y2="56"  stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="140" y1="224" x2="140" y2="240" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="40"  y1="140" x2="56"  y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="224" y1="140" x2="240" y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="69"  y1="69"  x2="80"  y2="80"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-          <line x1="200" y1="80"  x2="211" y2="69"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-          <line x1="69"  y1="211" x2="80"  y2="200" stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-          <line x1="200" y1="200" x2="211" y2="211" stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-
-          <polygon points="140,57 165,63 187,80 204,103 213,131 211,160 198,184 178,202 152,212 124,210 99,200 78,182 64,156 60,128 67,101 84,79 107,65 134,58"
-                   fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.5"/>
-
-          <circle cx="93"  cy="105" r="1.6" fill="#8B3A2E" opacity="0.45"/>
-          <circle cx="195" cy="98"  r="1.4" fill="#8B3A2E" opacity="0.4"/>
-          <circle cx="208" cy="170" r="1.6" fill="#8B3A2E" opacity="0.45"/>
-          <circle cx="118" cy="200" r="1.4" fill="#8B3A2E" opacity="0.4"/>
-          <circle cx="72"  cy="155" r="1.4" fill="#8B3A2E" opacity="0.4"/>
-        </g>
-
-        <text fill="#8B3A2E" font-family="Lato, system-ui, sans-serif" font-size="13" letter-spacing="5" font-weight="600" opacity="0.85">
-          <textPath href="#seal-master-rim-top" startOffset="50%" text-anchor="middle">LOCAL  ·  CIRCLE</textPath>
-        </text>
-        <text x="140" y="160" text-anchor="middle" fill="#8B3A2E" font-family="'Cormorant Garamond', Georgia, serif" font-size="68" font-style="italic" filter="url(#brushy)" opacity="0.92">輪</text>
-        <path id="seal-master-rim-top" d="M 56,140 A 84,84 0 0,1 224,140" fill="none"/>
-      </symbol>
-
-      <!-- Austin city seal: 歩 (walk) at center, "AUSTIN · TEXAS" on top arc, "FIRST SATURDAY" on bottom -->
-      <symbol id="seal-austin" viewBox="0 0 280 280">
-        <g filter="url(#brushy)" transform="rotate(7 140 140)">
-          <circle cx="140" cy="140" r="118" fill="none" stroke="#8B3A2E" stroke-width="1.6" opacity="0.85"/>
-          <circle cx="140" cy="140" r="105" fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.55" stroke-dasharray="3 3"/>
-          <circle cx="140" cy="140" r="88"  fill="none" stroke="#8B3A2E" stroke-width="0.9" opacity="0.55" stroke-dasharray="6 2"/>
-
-          <line x1="140" y1="40"  x2="140" y2="56"  stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="140" y1="224" x2="140" y2="240" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="40"  y1="140" x2="56"  y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="224" y1="140" x2="240" y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="69"  y1="80"  x2="80"  y2="91"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-          <line x1="200" y1="89"  x2="211" y2="78"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-
-          <!-- Lady Bird Lake-shaped polygon -->
-          <polygon points="140,72 175,78 205,98 215,128 200,160 165,180 130,185 95,175 72,150 70,118 88,92 115,78"
-                   fill="none" stroke="#8B3A2E" stroke-width="0.8" opacity="0.55"/>
-
-          <circle cx="100" cy="115" r="1.6" fill="#8B3A2E" opacity="0.45"/>
-          <circle cx="190" cy="105" r="1.4" fill="#8B3A2E" opacity="0.4"/>
-          <circle cx="180" cy="170" r="1.4" fill="#8B3A2E" opacity="0.4"/>
-        </g>
-
-        <text fill="#8B3A2E" font-family="Lato, system-ui, sans-serif" font-size="13" letter-spacing="5" font-weight="600" opacity="0.85">
-          <textPath href="#seal-austin-rim-top" startOffset="50%" text-anchor="middle">AUSTIN  ·  TEXAS</textPath>
-        </text>
-        <text fill="#8B3A2E" font-family="Lato, system-ui, sans-serif" font-size="9" letter-spacing="6" font-weight="500" opacity="0.7">
-          <textPath href="#seal-austin-rim-bot" startOffset="50%" text-anchor="middle">FIRST SATURDAY</textPath>
-        </text>
-        <text x="140" y="160" text-anchor="middle" fill="#8B3A2E" font-family="'Cormorant Garamond', Georgia, serif" font-size="68" font-style="italic" filter="url(#brushy)" opacity="0.92">歩</text>
-        <path id="seal-austin-rim-top" d="M 56,140 A 84,84 0 0,1 224,140" fill="none"/>
-        <path id="seal-austin-rim-bot" d="M 224,148 A 84,84 0 0,1 56,148" fill="none"/>
-      </symbol>
-    </defs>
-  </svg>
-
   <main>
 
     <header class="hero">
-      <svg class="hero-seal seal-master" role="img" aria-label="Local Circle seal"><use href="#seal-master"/></svg>
+      <div class="hero-seal seal-master" data-seal="master"></div>
       <h1>local circle</h1>
       <p class="tagline">walk local</p>
     </header>
@@ -120,11 +41,8 @@
 
     <p class="section-label">where we walk</p>
 
-    <div class="city-grid">
-      <a class="city-tile" href="/austin/">
-        <svg class="city-tile-seal" role="img" aria-label="Austin circle seal"><use href="#seal-austin"/></svg>
-        <div class="city-tile-name">Austin</div>
-      </a>
+    <div class="city-grid" id="city-grid">
+      <!-- City tiles rendered from #cities-data -->
       <div class="city-tile empty" aria-hidden="true">
         <div class="city-tile-seal">+</div>
         <div class="city-tile-name">Your city?</div>
@@ -141,6 +59,77 @@
   <footer>
     <p>walk.lc &middot; a sister project of <a href="https://pilgrimapp.org">pilgrim</a></p>
   </footer>
+
+  <script id="cities-data" type="application/json">
+    [
+      {
+        "slug": "austin",
+        "name": "Austin",
+        "state": "Texas",
+        "kanji": "歩",
+        "lat": 30.27,
+        "lng": -97.74,
+        "loop": [
+          [30.2728, -97.7506],
+          [30.2716, -97.7475],
+          [30.2691, -97.7437],
+          [30.2658, -97.7414],
+          [30.2625, -97.7407],
+          [30.2599, -97.7430],
+          [30.2585, -97.7470],
+          [30.2592, -97.7510],
+          [30.2613, -97.7547],
+          [30.2647, -97.7569],
+          [30.2683, -97.7570],
+          [30.2715, -97.7548]
+        ],
+        "cadence": { "pattern": "first-saturday", "time": "08:00", "tz": "America/Chicago" }
+      }
+    ]
+  </script>
+
+  <script src="/js/seal.js"></script>
+  <script>
+    // Render the homepage city tiles from #cities-data using the seal renderer.
+    (function() {
+      function ready(cb) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', cb);
+        } else {
+          cb();
+        }
+      }
+      ready(function() {
+        var dataEl = document.getElementById('cities-data');
+        var grid   = document.getElementById('city-grid');
+        if (!dataEl || !grid || !window.LocalCircleSeal) return;
+
+        var cities;
+        try { cities = JSON.parse(dataEl.textContent); }
+        catch (err) { console.error('[homepage] failed to parse cities-data:', err); return; }
+
+        var emptyTile = grid.querySelector('.city-tile.empty');
+
+        cities.forEach(function(city) {
+          var tile = document.createElement('a');
+          tile.className = 'city-tile';
+          tile.href = '/' + city.slug + '/';
+
+          var sealHolder = document.createElement('div');
+          sealHolder.className = 'city-tile-seal';
+          tile.appendChild(sealHolder);
+
+          var name = document.createElement('div');
+          name.className = 'city-tile-name';
+          name.textContent = city.name;
+          tile.appendChild(name);
+
+          grid.insertBefore(tile, emptyTile);
+          window.LocalCircleSeal.renderCitySeal(sealHolder, city);
+        });
+      });
+    })();
+  </script>
 
 </body>
 </html>

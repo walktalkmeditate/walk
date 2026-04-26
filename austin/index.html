@@ -25,53 +25,10 @@
 </head>
 <body>
 
-  <!-- Inline SVG seal definition. Static placeholder for v1; replaced by
-       js/seal.js procedural renderer in implementation step 2. -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <filter id="brushy" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="11"/>
-        <feDisplacementMap in="SourceGraphic" scale="1.5"/>
-      </filter>
-
-      <symbol id="seal-austin" viewBox="0 0 280 280">
-        <g filter="url(#brushy)" transform="rotate(7 140 140)">
-          <circle cx="140" cy="140" r="118" fill="none" stroke="#8B3A2E" stroke-width="1.6" opacity="0.85"/>
-          <circle cx="140" cy="140" r="105" fill="none" stroke="#8B3A2E" stroke-width="0.7" opacity="0.55" stroke-dasharray="3 3"/>
-          <circle cx="140" cy="140" r="88"  fill="none" stroke="#8B3A2E" stroke-width="0.9" opacity="0.55" stroke-dasharray="6 2"/>
-
-          <line x1="140" y1="40"  x2="140" y2="56"  stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="140" y1="224" x2="140" y2="240" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="40"  y1="140" x2="56"  y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="224" y1="140" x2="240" y2="140" stroke="#8B3A2E" stroke-width="0.9" opacity="0.6" stroke-linecap="round"/>
-          <line x1="69"  y1="80"  x2="80"  y2="91"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-          <line x1="200" y1="89"  x2="211" y2="78"  stroke="#8B3A2E" stroke-width="0.6" opacity="0.45" stroke-linecap="round"/>
-
-          <polygon points="140,72 175,78 205,98 215,128 200,160 165,180 130,185 95,175 72,150 70,118 88,92 115,78"
-                   fill="none" stroke="#8B3A2E" stroke-width="0.8" opacity="0.55"/>
-
-          <circle cx="100" cy="115" r="1.6" fill="#8B3A2E" opacity="0.45"/>
-          <circle cx="190" cy="105" r="1.4" fill="#8B3A2E" opacity="0.4"/>
-          <circle cx="180" cy="170" r="1.4" fill="#8B3A2E" opacity="0.4"/>
-        </g>
-
-        <text fill="#8B3A2E" font-family="Lato, system-ui, sans-serif" font-size="13" letter-spacing="5" font-weight="600" opacity="0.85">
-          <textPath href="#seal-austin-rim-top" startOffset="50%" text-anchor="middle">AUSTIN  ·  TEXAS</textPath>
-        </text>
-        <text fill="#8B3A2E" font-family="Lato, system-ui, sans-serif" font-size="9" letter-spacing="6" font-weight="500" opacity="0.7">
-          <textPath href="#seal-austin-rim-bot" startOffset="50%" text-anchor="middle">FIRST SATURDAY</textPath>
-        </text>
-        <text x="140" y="160" text-anchor="middle" fill="#8B3A2E" font-family="'Cormorant Garamond', Georgia, serif" font-size="68" font-style="italic" filter="url(#brushy)" opacity="0.92">歩</text>
-        <path id="seal-austin-rim-top" d="M 56,140 A 84,84 0 0,1 224,140" fill="none"/>
-        <path id="seal-austin-rim-bot" d="M 224,148 A 84,84 0 0,1 56,148" fill="none"/>
-      </symbol>
-    </defs>
-  </svg>
-
   <main>
 
     <header class="hero">
-      <svg class="hero-seal seal-city" role="img" aria-label="Austin circle seal"><use href="#seal-austin"/></svg>
+      <div class="hero-seal seal-city" data-seal="city" aria-label="Austin circle seal"></div>
       <h1>austin</h1>
       <p class="subtitle">the austin circle</p>
     </header>
@@ -124,6 +81,33 @@
   <footer>
     <p><a href="/">walk.lc</a> &middot; the austin circle</p>
   </footer>
+
+  <script id="city-data" type="application/json">
+    {
+      "name": "Austin",
+      "state": "Texas",
+      "kanji": "歩",
+      "lat": 30.27,
+      "lng": -97.74,
+      "loop": [
+        [30.2728, -97.7506],
+        [30.2716, -97.7475],
+        [30.2691, -97.7437],
+        [30.2658, -97.7414],
+        [30.2625, -97.7407],
+        [30.2599, -97.7430],
+        [30.2585, -97.7470],
+        [30.2592, -97.7510],
+        [30.2613, -97.7547],
+        [30.2647, -97.7569],
+        [30.2683, -97.7570],
+        [30.2715, -97.7548]
+      ],
+      "cadence": { "pattern": "first-saturday", "time": "08:00", "tz": "America/Chicago" }
+    }
+  </script>
+
+  <script src="/js/seal.js"></script>
 
 </body>
 </html>
