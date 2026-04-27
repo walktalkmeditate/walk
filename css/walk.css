@@ -1,0 +1,1063 @@
+/*
+ * /walk — the duck tabi.
+ * Sumi-e ink path + seasonal dots + paper-grain atmosphere.
+ * Ported from Pilgrim/Scenes/Home/{InkScrollView,CalligraphyPathRenderer,WalkDotView}.
+ */
+
+:root {
+  --walk-parchment: #f5f0e8;
+  --walk-parchment-edge: #ece5d5;
+  --walk-ink: #2c241e;
+  --walk-stone: #8b7355;
+  --walk-fog: #b8afa2;
+  --walk-moss: #7a8b6f;
+  --walk-rust: #a0634b;
+  --walk-dawn: #c4956a;
+  --walk-red-seal: #a43a2e;
+  --walk-ink-soft: rgba(44, 36, 30, 0.55);
+  --walk-ink-softer: rgba(44, 36, 30, 0.38);
+  --walk-ink-faintest: rgba(44, 36, 30, 0.18);
+}
+
+[data-theme="dark"] {
+  --walk-parchment: #1a1611;
+  --walk-parchment-edge: #14110d;
+  --walk-ink: #f0ebe1;
+  --walk-stone: #b29575;
+  --walk-fog: #5e564c;
+  --walk-moss: #8fa383;
+  --walk-rust: #c27856;
+  --walk-dawn: #d9a374;
+  --walk-red-seal: #b04235;
+  --walk-ink-soft: rgba(240, 235, 225, 0.62);
+  --walk-ink-softer: rgba(240, 235, 225, 0.42);
+  --walk-ink-faintest: rgba(240, 235, 225, 0.18);
+}
+
+.walk-body {
+  background: var(--walk-parchment);
+  color: var(--walk-ink);
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+  line-height: 1.55;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  transition:
+    background-color 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Match the slow curve on everything that changes between modes */
+.walk-body,
+.walk-body::before,
+.walk-body::after,
+.walk-state-line,
+.walk-stats-line,
+.walk-entry,
+.walk-entry-stage,
+.walk-entry-stage-ja,
+.walk-entry-weather,
+.walk-entry-km,
+.walk-entry-author,
+.walk-back,
+.walk-source a,
+.walk-path-stroke,
+.walk-path-fiber,
+.walk-dot-bleed,
+.walk-dot-body,
+.walk-dot-pool,
+.walk-bgmap-full,
+.walk-bgmap-walked,
+.walk-bgmap-duck,
+.walk-stars {
+  transition:
+    background-color 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    fill 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    fill-opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    stroke-opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Paper grain — subtle SVG noise overlay */
+.walk-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.045 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  z-index: 0;
+}
+
+[data-theme="dark"] .walk-body::before {
+  mix-blend-mode: screen;
+  opacity: 0.35;
+}
+
+/* Soft vignette at edges suggests hand-bound page */
+.walk-body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 60%, var(--walk-parchment-edge) 100%);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.walk-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---- Background watermark: the real Shikoku route the duck has walked ---- */
+
+.walk-bgmap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.walk-bgmap-svg {
+  width: min(90vw, 1100px);
+  height: min(90vh, 1100px);
+  opacity: 0.85;
+}
+
+.walk-bgmap-full {
+  fill: none;
+  stroke: var(--walk-stone);
+  stroke-width: 0.9;
+  stroke-opacity: 0.16;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.walk-bgmap-walked {
+  fill: none;
+  stroke: var(--walk-ink);
+  stroke-width: 1.3;
+  stroke-opacity: 0.30;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.walk-bgmap-duck {
+  fill: var(--walk-stone);
+  fill-opacity: 0.55;
+}
+
+[data-theme="dark"] .walk-bgmap-full { stroke-opacity: 0.10; }
+[data-theme="dark"] .walk-bgmap-walked { stroke-opacity: 0.22; }
+
+body.constellation .walk-bgmap-full { stroke-opacity: 0.14; stroke: #e8dfc6; }
+body.constellation .walk-bgmap-walked { stroke-opacity: 0.32; stroke: #e8dfc6; }
+body.constellation .walk-bgmap-duck { fill: #e8dfc6; fill-opacity: 0.75; }
+
+/* ---- Top bar (back + moon) ---- */
+
+.walk-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.walk-topbar > * { pointer-events: auto; }
+
+.walk-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  border-bottom: none;
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+  font-size: 0.85rem;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  color: var(--walk-ink-soft);
+  padding: 0.3rem 0.5rem;
+  border-radius: 2px;
+  transition: color 300ms ease, opacity 300ms ease;
+  opacity: 0.75;
+}
+
+.walk-back:hover,
+.walk-back:focus,
+.walk-back:focus-visible {
+  color: var(--walk-ink);
+  opacity: 1;
+  outline: none;
+  border-bottom-color: transparent;
+}
+
+.walk-moon {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: opacity 300ms ease, transform 400ms ease;
+  position: relative;
+}
+
+.walk-moon:hover,
+.walk-moon:focus-visible {
+  opacity: 1;
+  outline: none;
+  transform: scale(1.04);
+}
+
+.walk-moon canvas {
+  display: block;
+}
+
+/* ---- Main ---- */
+
+.walk-main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Corner flourishes */
+.walk-corner {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  color: var(--walk-stone);
+  pointer-events: none;
+}
+.walk-corner--tl { top: 1.5rem; left: 1.25rem; }
+.walk-corner--br { bottom: 1.5rem; right: 1.25rem; }
+
+@media (max-width: 640px) {
+  .walk-corner { width: 32px; height: 32px; }
+  .walk-corner--tl { top: 1rem; left: 0.5rem; }
+  .walk-corner--br { bottom: 1rem; right: 0.5rem; }
+}
+
+/* ---- Header ---- */
+
+.walk-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.walk-header-duck {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  opacity: 0.88;
+  vertical-align: middle;
+  margin-bottom: 0.35rem;
+}
+
+.walk-header-title {
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: var(--walk-ink);
+  margin: 0.25rem 0 0.7rem;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+}
+
+.walk-state-line {
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--walk-ink-soft);
+  margin: 0;
+}
+
+.walk-stats-line {
+  font-family: var(--font-ui, "Lato"), "Helvetica Neue", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--walk-ink-softer);
+  margin: 0.7rem 0 0;
+  font-weight: 500;
+}
+
+.walk-stats-sep {
+  display: inline-block;
+  margin: 0 0.5rem;
+  opacity: 0.55;
+}
+
+/* ---- Journey ---- */
+
+.walk-journey {
+  position: relative;
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0;
+  padding-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .walk-journey {
+    grid-template-columns: 54px 1fr;
+  }
+  .walk-main {
+    padding: 4rem 1rem 4rem;
+  }
+}
+
+.walk-path {
+  grid-column: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Brush-stroke segments — stroked bezier per pair of dots */
+.walk-path-stroke {
+  stroke: var(--walk-ink);
+  stroke-opacity: 0.65;
+}
+.walk-path-stroke--older { stroke-opacity: 0.40; }
+.walk-path-stroke--oldest { stroke-opacity: 0.22; }
+
+.walk-path-fiber {
+  stroke: var(--walk-ink);
+  stroke-opacity: 0.18;
+  stroke-linecap: round;
+}
+
+/* Dot layers */
+.walk-dot-bleed {
+  fill-opacity: 0.22;
+  filter: url(#sumi-dot-3);
+}
+.walk-dot-body {
+  filter: url(#sumi-dot);
+  filter: drop-shadow(0 1px 1.5px rgba(44, 36, 30, 0.2));
+}
+.walk-dot-body--irregular {
+  filter: url(#sumi-dot-2);
+}
+.walk-dot-pool {
+  fill-opacity: 0.48;
+}
+.walk-dot-highlight {
+  fill: rgba(255, 255, 255, 0.32);
+}
+.walk-dot-ring {
+  fill: none;
+  stroke-width: 1.1;
+  stroke-opacity: 0.55;
+}
+
+[data-theme="dark"] .walk-dot-highlight {
+  fill: rgba(240, 235, 225, 0.22);
+}
+
+/* Duck marker — the clickable easter egg. The duck stays put on hover;
+   no transform (SVG <image> origin is top-left, so scale/translate shifts
+   the image unintuitively). */
+.walk-duck-link {
+  cursor: pointer;
+  text-decoration: none;
+  outline: none;
+}
+.walk-duck-marker {
+  pointer-events: auto;
+}
+
+/* Draw-in animation — the path & dots appear as if being written. */
+.walk-path-stroke,
+.walk-path-fiber {
+  opacity: 0;
+  animation: walk-appear 700ms ease-out forwards;
+  animation-delay: calc(var(--seg-i, 0) * 180ms + 200ms);
+}
+
+.walk-dot-group {
+  opacity: 0;
+  animation: walk-appear 550ms ease-out forwards;
+  animation-delay: calc(var(--dot-i, 0) * 180ms + 350ms);
+}
+
+.walk-duck-marker {
+  opacity: 0;
+  animation: walk-appear 600ms ease-out forwards;
+  animation-delay: 200ms; /* duck shows first — it's already there */
+}
+
+@keyframes walk-appear {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Entries — right column */
+
+.walk-entries {
+  grid-column: 2;
+  padding-left: 1.4rem;
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+@media (max-width: 640px) {
+  .walk-entries {
+    padding-left: 0.9rem;
+    padding-top: 1.5rem;
+    gap: 2rem;
+  }
+}
+
+/* Origin note — sits below the oldest entry in the flex column, no dot.
+   Fades in on a gentle delay so it rewards the scroll rather than competing
+   with the first render. Leading 鴨 kanji colored like the goshuin seal. */
+.walk-origin {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--walk-ink-softer);
+  opacity: 0;
+  animation: walk-origin-fade 1400ms ease-out 800ms forwards;
+}
+.walk-origin-duck {
+  color: var(--walk-red-seal);
+  font-family: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", serif;
+  font-style: normal;
+  font-size: 1.25em;
+  line-height: 1;
+  font-weight: 500;
+  opacity: 0.88;
+}
+.walk-origin-text { letter-spacing: 0.02em; }
+@keyframes walk-origin-fade {
+  to { opacity: 0.72; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-origin { animation: none; opacity: 0.72; }
+}
+
+.walk-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: opacity 400ms ease;
+  opacity: 0;
+  animation: walk-appear 600ms ease-out forwards;
+  animation-delay: calc(var(--dot-i, 0) * 180ms + 500ms);
+}
+
+.walk-entry-meta {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+  color: var(--walk-ink-softer);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-family: var(--font-ui, "Lato"), "Helvetica Neue", sans-serif;
+  font-weight: 500;
+}
+
+.walk-entry-moon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+.walk-entry-weather,
+.walk-entry-km {
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: none;
+  font-style: italic;
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--walk-ink-softer);
+}
+
+.walk-entry-meta-sub {
+  flex-basis: 100%;
+  display: flex;
+  gap: 0.7rem;
+  align-items: baseline;
+  margin-top: 0.1rem;
+}
+
+.walk-entry-date {
+  font-variant-numeric: tabular-nums;
+}
+
+.walk-entry-stage {
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--walk-ink-soft);
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+  font-size: 0.88rem;
+  font-weight: 400;
+}
+
+.walk-entry-stage-ja {
+  font-size: 0.78rem;
+  color: var(--walk-ink-softer);
+  font-style: normal;
+  letter-spacing: 0.06em;
+  margin-left: 0.5rem;
+  font-family: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", "MS Mincho", serif;
+}
+
+.walk-entry-glyph {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--walk-ink);
+  margin-top: 0.1rem;
+}
+
+.walk-entry-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  font-size: 1.18rem;
+  line-height: 1.6;
+  color: var(--walk-ink);
+  margin-top: 0.2rem;
+}
+
+.walk-entry-body p { margin: 0; }
+
+/* Kind-specific entry treatments */
+
+/* A silence is a silence — no "( silence )" label announcing itself.
+   The entry is just the meta row + a faint glyph; no body. The shorter
+   card compresses the gap to the next dot, which reads as "a quiet day". */
+.walk-entry--silence .walk-entry-body { display: none; }
+.walk-entry--silence .walk-entry-glyph {
+  opacity: 0.35;
+  font-size: 1.05rem;
+}
+.walk-entry--silence .walk-entry-stage,
+.walk-entry--silence .walk-entry-date { opacity: 0.55; }
+
+.walk-entry--threshold {
+  padding: 0.75rem 0;
+  position: relative;
+}
+.walk-entry--threshold .walk-entry-glyph { font-size: 1.9rem; }
+.walk-entry--threshold .walk-entry-body {
+  font-size: 1.3rem;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+/* Goshuin-style red seal for threshold entries */
+.walk-entry--threshold::before {
+  content: "";
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 48px;
+  height: 48px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><defs><filter id='s' x='-15' y='-15' width='130' height='130'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='19' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='2.3'/></filter></defs><g filter='url(%23s)' fill='none' stroke='%23a43a2e' stroke-width='2' opacity='0.78'><rect x='6' y='6' width='36' height='36'/><rect x='10' y='10' width='28' height='28'/><line x1='24' y1='12' x2='24' y2='36'/><line x1='12' y1='24' x2='36' y2='24'/></g></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.72;
+  transform: rotate(-4deg);
+  pointer-events: none;
+}
+
+.walk-entry--letter .walk-entry-body {
+  font-size: 1rem;
+  line-height: 1.75;
+  max-width: 560px;
+  color: var(--walk-ink);
+  opacity: 0.88;
+}
+.walk-entry--letter .walk-entry-glyph { font-size: 1.05rem; opacity: 0.55; }
+
+.walk-entry-author {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--walk-ink-softer);
+  margin-top: 0.25rem;
+  font-family: var(--font-display, "Cormorant Garamond"), Georgia, serif;
+}
+
+/* Age fade */
+.walk-entry--age-soft { opacity: 0.72; }
+.walk-entry--age-distant { opacity: 0.42; }
+.walk-entry--age-distant .walk-entry-body,
+.walk-entry--age-distant .walk-entry-author { display: none; }
+
+/* Empty */
+.walk-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--walk-ink-softer);
+  font-style: italic;
+  padding: 4rem 0;
+}
+
+/* Ripple on newest dot */
+@keyframes walk-ripple {
+  0%   { r: 11; opacity: 0.38; stroke-width: 1.4; }
+  100% { r: 34; opacity: 0;    stroke-width: 0.25; }
+}
+
+.walk-dot-ripple {
+  animation: walk-ripple 2.6s ease-out infinite;
+  transform-origin: center;
+}
+.walk-dot-ripple--delayed { animation-delay: 1.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .walk-path-segment, .walk-path-fiber, .walk-dot-group,
+  .walk-entry, .walk-duck-marker,
+  .walk-dot-ripple, .walk-dot-ripple--delayed {
+    animation: none;
+    opacity: 1;
+  }
+  .walk-dot-ripple, .walk-dot-ripple--delayed { opacity: 0.18; }
+}
+
+/* Footer */
+.walk-footer {
+  margin-top: 5rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.walk-tagline {
+  font-size: 0.72rem;
+  color: var(--walk-ink-faintest);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.walk-source {
+  margin: 1.5rem 0 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-family: var(--font-ui, "Lato"), "Helvetica Neue", sans-serif;
+}
+.walk-source a {
+  color: var(--walk-ink-faintest);
+  text-decoration: none;
+  border-bottom: none;
+  transition: color 300ms ease;
+  padding: 0.3rem 0.6rem;
+}
+.walk-source a:hover,
+.walk-source a:focus,
+.walk-source a:focus-visible {
+  color: var(--walk-ink-softer);
+  outline: none;
+  border-bottom-color: transparent;
+}
+
+/* Current-stage goshuin — hand-stamped circular seal at bottom-left, mirrors
+   the Pilgrim app's circular reliquary seal and the OG card composition. */
+.walk-stage-seal {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  width: 78px;
+  height: 78px;
+  transform: rotate(-4deg);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.walk-stage-seal svg {
+  width: 100%;
+  height: 100%;
+}
+.walk-stage-seal-frame {
+  fill: none;
+  stroke: var(--walk-red-seal);
+  stroke-width: 1.6;
+  stroke-opacity: 0.8;
+}
+.walk-stage-seal-frame-inner {
+  fill: none;
+  stroke: var(--walk-red-seal);
+  stroke-width: 1.1;
+  stroke-opacity: 0.6;
+}
+.walk-stage-seal-kanji {
+  font-family: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "MS Mincho", serif;
+  font-weight: 600;
+  fill: var(--walk-red-seal);
+  fill-opacity: 0.85;
+  text-anchor: middle;
+}
+
+@media (max-width: 640px) {
+  .walk-stage-seal {
+    /* Smaller + fainter on mobile so the seal doesn't sit on top of the
+       centered footer tagline. Still visible, just more ghostly. */
+    width: 48px;
+    height: 48px;
+    bottom: 1rem;
+    left: 0.75rem;
+    opacity: 0.55;
+  }
+}
+
+[data-theme="dark"] .walk-stage-seal-frame,
+[data-theme="dark"] .walk-stage-seal-frame-inner { stroke-opacity: 0.5; }
+[data-theme="dark"] .walk-stage-seal-kanji { fill-opacity: 0.6; }
+
+body.constellation .walk-stage-seal-frame,
+body.constellation .walk-stage-seal-frame-inner { stroke-opacity: 0.75; }
+body.constellation .walk-stage-seal-kanji { fill-opacity: 0.85; }
+
+/* Goshuin accumulator — one red ink seal per completed route */
+.walk-goshuin-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 0 0 2rem;
+  min-height: 0;
+}
+.walk-goshuin-row:empty { display: none; }
+.walk-goshuin {
+  width: 42px;
+  height: 42px;
+  opacity: 0.78;
+  transform: rotate(-3deg);
+  filter: url(#sumi-dot-3);
+}
+.walk-goshuin + .walk-goshuin { transform: rotate(2deg); }
+.walk-goshuin + .walk-goshuin + .walk-goshuin { transform: rotate(-4deg); }
+
+/* ---- Constellation mode (triple-click the moon) ---- */
+
+.walk-stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+}
+
+body.constellation .walk-stars { opacity: 1; }
+
+body.constellation {
+  /* Subtle cosmic shift regardless of theme */
+  --walk-parchment: #0e0d14;
+  --walk-parchment-edge: #07060a;
+  --walk-ink: #e8dfc6;
+  --walk-ink-soft: rgba(232, 223, 198, 0.65);
+  --walk-ink-softer: rgba(232, 223, 198, 0.42);
+  --walk-ink-faintest: rgba(232, 223, 198, 0.22);
+  --walk-stone: #b99870;
+  --walk-moss: #8ea886;
+  --walk-rust: #c97d5e;
+  --walk-dawn: #dca476;
+  --walk-red-seal: #c04e3e;
+}
+
+body.constellation .walk-body::before { opacity: 0; }
+body.constellation .walk-body::after {
+  background: radial-gradient(ellipse at top, rgba(255,255,255,0.04) 0%, transparent 60%);
+  opacity: 1;
+}
+
+/* Generated star layer — procedural background stars via radial-gradients */
+body.constellation .walk-stars::before,
+body.constellation .walk-stars::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 21% 37%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 36% 18%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1px 1px at 47% 62%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 58% 24%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 71% 45%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 82% 16%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 93% 38%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1px 1px at 15% 72%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.5px 1.5px at 29% 85%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1px 1px at 44% 91%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 63% 74%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 78% 88%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 89% 62%, rgba(255,255,255,0.5), transparent);
+  animation: walk-stars-breathe 6s ease-in-out infinite alternate;
+}
+body.constellation .walk-stars::after {
+  animation-delay: 2s;
+  filter: blur(0.4px);
+}
+
+@keyframes walk-stars-breathe {
+  0%   { opacity: 0.55; }
+  100% { opacity: 0.9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.constellation .walk-stars::before,
+  body.constellation .walk-stars::after {
+    animation: none;
+    opacity: 0.75;
+  }
+}
+
+/* ---- Page breathes — 8s radial pulse, sets the tempo ---- */
+
+.walk-breathe {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at center, rgba(139, 115, 85, 0.06), transparent 68%);
+  opacity: 0;
+  animation: walk-breathe-pulse 8s ease-in-out infinite alternate;
+}
+@keyframes walk-breathe-pulse {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+[data-theme="dark"] .walk-breathe {
+  background: radial-gradient(ellipse at center, rgba(232, 223, 198, 0.04), transparent 70%);
+}
+body.constellation .walk-breathe {
+  background: radial-gradient(ellipse at center, rgba(185, 152, 112, 0.07), transparent 64%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-breathe { animation: none; opacity: 0.4; }
+}
+
+/* ---- Shooting star (constellation mode only; spawned by JS) ---- */
+
+.walk-shooting-star {
+  position: fixed;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  z-index: 2;
+  animation: walk-star-shoot 900ms ease-out forwards;
+}
+.walk-shooting-star::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 70px; height: 1px;
+  background: linear-gradient(to right, rgba(255,255,255,0.85), transparent);
+  transform: rotate(25deg);
+  transform-origin: left center;
+}
+@keyframes walk-star-shoot {
+  0%   { opacity: 0; transform: translate(0, 0) scale(1); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx, 260px), var(--sy, 140px)) scale(0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-shooting-star { display: none; }
+}
+
+/* ---- Seasonal drift — one particle every 12s ---- */
+
+.walk-drift {
+  position: fixed;
+  top: -40px;
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+  user-select: none;
+  /* Default 22s duration so the CSS is self-sufficient; JS overrides
+     per-particle to randomize between 18-26s. */
+  animation: walk-drift-fall 22s linear forwards;
+}
+@keyframes walk-drift-fall {
+  0%   { opacity: 0;   transform: translateY(0) translateX(0) rotate(var(--rot, 0deg)); }
+  12%  { opacity: 0.8; }
+  88%  { opacity: 0.8; }
+  100% { opacity: 0;   transform: translateY(110vh) translateX(var(--drift, 0px)) rotate(calc(var(--rot, 0deg) + 360deg)); }
+}
+.walk-drift--firefly {
+  top: auto;
+  width: 5px; height: 5px;
+  background: radial-gradient(circle, rgba(255, 226, 140, 0.95), rgba(255, 200, 80, 0.35) 55%, transparent 72%);
+  border-radius: 50%;
+  filter: blur(0.4px);
+  animation-name: walk-drift-float;
+  animation-duration: 18s;
+}
+@keyframes walk-drift-float {
+  0%   { opacity: 0; transform: translate(0, 0); }
+  20%, 80% { opacity: 0.85; }
+  50%  { transform: translate(var(--drift, 30px), -40vh); }
+  100% { opacity: 0; transform: translate(calc(var(--drift, 30px) * 2), -80vh); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-drift { display: none; }
+}
+
+/* ---- Long-press brushstroke — ephemeral ink bloom ---- */
+
+.walk-brush-mark {
+  position: fixed;
+  pointer-events: none;
+  z-index: 3;
+  width: 120px; height: 50px;
+  overflow: visible;
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(var(--mark-rot, 0deg)) scale(calc(var(--mark-scale, 1) * 0.3));
+  animation: walk-brush-bloom 3000ms ease-out forwards;
+}
+@keyframes walk-brush-bloom {
+  0%   { opacity: 0;    transform: translate(-50%, -50%) rotate(var(--mark-rot, 0deg)) scale(calc(var(--mark-scale, 1) * 0.3)); }
+  18%  { opacity: 0.85; transform: translate(-50%, -50%) rotate(var(--mark-rot, 0deg)) scale(var(--mark-scale, 1)); }
+  100% { opacity: 0;    transform: translate(-50%, -50%) rotate(var(--mark-rot, 0deg)) scale(calc(var(--mark-scale, 1) * 1.18)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-brush-mark { display: none; }
+}
+
+/* Satellite splatter — 1-3 ink dots fleck outward from the stroke center.
+   Dots start AT the stroke origin and animate to their destination
+   (--dx, --dy) during the first 18% of the animation, reading as ink
+   flecking off the brush as it lifts. Uses currentColor so red strokes
+   get red splatters. */
+.walk-splatter {
+  position: fixed;
+  width: var(--size, 6px);
+  height: var(--size, 6px);
+  border-radius: 50%;
+  background: currentColor;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  /* sumi-dot (gentler than sumi-dot-3) gives the edge a slight organic
+     irregularity without fragmenting small dots. */
+  filter: url(#sumi-dot);
+  transform: translate(-50%, -50%);
+  animation: walk-splatter-fly 2700ms ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+}
+@keyframes walk-splatter-fly {
+  0%   {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.4);
+  }
+  18%  {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) translate(var(--dx, 0px), var(--dy, 0px)) scale(1);
+  }
+  55%  {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) translate(var(--dx, 0px), var(--dy, 0px)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--dx, 0px), var(--dy, 0px)) scale(1.15);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-splatter { display: none; }
+}
+
+/* Constellation-mode alternate for long-press — 3-5 glowing dots scatter
+   around the pointer instead of an ink stroke. */
+.walk-star-puff {
+  position: fixed;
+  width: var(--size, 3px);
+  height: var(--size, 3px);
+  border-radius: 50%;
+  background: rgba(255, 245, 210, 0.95);
+  box-shadow: 0 0 6px 2px rgba(255, 226, 180, 0.55);
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  animation: walk-star-puff 1600ms ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+}
+@keyframes walk-star-puff {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0); }
+  15%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.3); }
+  60%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(0.7); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-star-puff { display: none; }
+}
+
+/* ---- Duck marker — hover bob + click spring + plink ring ---- */
+
+.walk-duck-marker {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.walk-duck-link:hover .walk-duck-marker {
+  transform: translateY(-2px) scale(1.06);
+}
+.walk-duck-link:active .walk-duck-marker {
+  transform: scale(0.88);
+  transition-duration: 110ms;
+}
+.walk-duck-plink {
+  fill: none;
+  stroke: var(--walk-ink);
+  stroke-width: 1.3;
+  stroke-opacity: 0;
+  pointer-events: none;
+  /* Use transform:scale instead of animating the `r` attribute — Safari 16
+     and earlier don't support CSS animation of SVG geometry attributes. The
+     circle is drawn at r=4 by JS; CSS scales it up to 5.5× (effective r=22).
+     `vector-effect: non-scaling-stroke` keeps the stroke at 1.3 throughout
+     so the ripple stays thin instead of thickening as it expands. */
+  transform-box: fill-box;
+  transform-origin: center;
+  vector-effect: non-scaling-stroke;
+  animation: walk-duck-plink 620ms ease-out forwards;
+}
+@keyframes walk-duck-plink {
+  0%   { stroke-opacity: 0.6; transform: scale(1); }
+  100% { stroke-opacity: 0;   transform: scale(5.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walk-duck-marker { transition: none; }
+  .walk-duck-link:hover .walk-duck-marker,
+  .walk-duck-link:active .walk-duck-marker { transform: none; }
+  .walk-duck-plink { display: none; }
+}

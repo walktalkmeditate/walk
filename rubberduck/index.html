@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>rubber duck walk</title>
+  <meta name="description" content="A rubber duck walking the Shikoku Henro, one stage at a time. Daily offerings from a small pilgrim.">
+  <meta name="author" content="a rubber duck">
+  <link rel="canonical" href="https://pilgrimapp.org/walk">
+  <meta name="theme-color" content="#f5f0e8">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="rubber duck walk">
+  <meta property="og:title" content="rubber duck walk">
+  <meta property="og:description" content="A rubber duck walking the Shikoku Henro. Daily offerings from a small pilgrim.">
+  <meta property="og:url" content="https://pilgrimapp.org/walk">
+  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/walktalkmeditate/rubberduck-walk@main/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A small rubber duck on a sumi-e ink path.">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="rubber duck walk">
+  <meta name="twitter:description" content="A rubber duck walking the Shikoku Henro. Daily offerings from a small pilgrim.">
+  <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/walktalkmeditate/rubberduck-walk@main/og-image.png">
+  <meta name="twitter:image:alt" content="A small rubber duck on a sumi-e ink path.">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "rubber duck walk",
+    "alternateName": "duck tabi",
+    "description": "A rubber duck walking the Shikoku Henro, one stage at a time.",
+    "url": "https://pilgrimapp.org/walk",
+    "inLanguage": "en",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Pilgrim",
+      "url": "https://pilgrimapp.org/"
+    }
+  }
+  </script>
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/duck/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/duck/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/duck/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/walk.css">
+
+  <!-- Analytics -->
+  <script defer src="https://analytics.walktalkmeditate.org/script.js" data-website-id="1ba0555d-f610-4cc4-bd1d-35c4b710ee3e"></script>
+</head>
+<body class="walk-body">
+  <!-- Decorative sumi-e filters + constellation stars live in a single hidden SVG. -->
+  <svg class="walk-defs" width="0" height="0" aria-hidden="true">
+    <defs>
+      <!-- Irregular ink-edge filter for dots -->
+      <filter id="sumi-dot" x="-40%" y="-40%" width="180%" height="180%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6"/>
+      </filter>
+      <filter id="sumi-dot-2" x="-40%" y="-40%" width="180%" height="180%">
+        <feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="17" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2"/>
+      </filter>
+      <filter id="sumi-dot-3" x="-40%" y="-40%" width="180%" height="180%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" seed="43" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8"/>
+      </filter>
+      <!-- Brush-fiber filter for the path -->
+      <filter id="brush-fiber" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="11" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.4"/>
+      </filter>
+      <!-- Soft paper-grain noise overlay (applied to body bg) -->
+      <filter id="paper-grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/>
+        <feColorMatrix values="0 0 0 0 0
+                               0 0 0 0 0
+                               0 0 0 0 0
+                               0 0 0 0.06 0"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Top bar: back link + moon toggle -->
+  <nav class="walk-topbar" aria-label="Navigation">
+    <a class="walk-back" href="/">
+      <span aria-hidden="true">←</span>
+      <span>walk.lc</span>
+    </a>
+    <button type="button" class="walk-moon" id="walk-moon"
+            aria-label="Toggle theme (triple-click for constellation)"
+            title="light / dark · triple-click for stars"></button>
+  </nav>
+
+  <!-- Breathing overlay — barely-perceptible radial pulse, 8s cycle. -->
+  <div class="walk-breathe" aria-hidden="true"></div>
+
+  <!-- Faint geographic watermark — the actual Shikoku coords walked so far. -->
+  <div class="walk-bgmap" id="walk-bgmap" aria-hidden="true"></div>
+
+  <main class="walk-main">
+    <header class="walk-header">
+      <img class="walk-header-duck" src="/assets/duck/duck-48.png" srcset="/assets/duck/duck-48.png 1x, /assets/duck/apple-touch-icon.png 2x" width="28" height="28" alt="">
+      <h1 class="walk-header-title">duck tabi</h1>
+      <p class="walk-state-line" id="walk-state-line" aria-live="polite">…</p>
+      <p class="walk-stats-line" id="walk-stats-line" aria-live="polite"></p>
+    </header>
+
+    <section class="walk-journey" aria-label="The duck's offerings">
+      <div class="walk-empty" id="walk-empty" hidden>The duck has not yet walked here.</div>
+    </section>
+
+    <!-- Subtle corner flourishes: two small sumi-e brush marks -->
+    <svg class="walk-corner walk-corner--tl" viewBox="0 0 60 60" aria-hidden="true">
+      <path d="M 10 10 C 14 22, 22 30, 38 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25"/>
+      <circle cx="40" cy="34" r="2.2" fill="currentColor" opacity="0.3"/>
+    </svg>
+    <svg class="walk-corner walk-corner--br" viewBox="0 0 60 60" aria-hidden="true">
+      <path d="M 50 50 C 46 38, 38 30, 22 26" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25"/>
+      <circle cx="20" cy="26" r="2.2" fill="currentColor" opacity="0.3"/>
+    </svg>
+
+    <!-- Current-stage goshuin — hand-stamped seal mirroring the OG composition -->
+    <div class="walk-stage-seal" id="walk-stage-seal" aria-hidden="true"></div>
+
+    <footer class="walk-footer">
+      <div class="walk-goshuin-row" id="walk-goshuin-row" aria-label="Completed pilgrimage seals"></div>
+      <p class="walk-tagline">a question cannot be asked unless there is already the potentiality of the answer</p>
+      <p class="walk-source">
+        <a href="https://github.com/walktalkmeditate/rubberduck-walk" target="_blank" rel="noopener">source</a>
+      </p>
+    </footer>
+  </main>
+
+  <!-- Constellation layer (only visible when body.constellation is set) -->
+  <div class="walk-stars" aria-hidden="true"></div>
+
+  <script src="/js/moon.js"></script>
+  <script src="/js/walk.js" defer></script>
+</body>
+</html>

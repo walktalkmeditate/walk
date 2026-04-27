@@ -459,6 +459,55 @@ footer a {
   padding-bottom: 1px;
 }
 
+.footer-duck {
+  display: inline-block;
+  margin-top: 1.25rem;
+  opacity: 0.6;
+  transition: opacity 300ms ease;
+  line-height: 0;
+  text-decoration: none;
+  border-bottom: none;
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.footer-duck:hover,
+.footer-duck:focus,
+.footer-duck:focus-visible {
+  border-bottom-color: transparent;
+}
+
+.footer-duck img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 250ms ease;
+}
+
+.footer-duck .footer-duck-animated {
+  opacity: 0;
+}
+
+.footer-duck:hover,
+.footer-duck:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.footer-duck:hover .footer-duck-static,
+.footer-duck:focus-visible .footer-duck-static {
+  opacity: 0;
+}
+
+.footer-duck:hover .footer-duck-animated,
+.footer-duck:focus-visible .footer-duck-animated {
+  opacity: 1;
+}
+
 /* ----- Reduced motion ----- */
 
 @media (prefers-reduced-motion: reduce) {
