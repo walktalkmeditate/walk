@@ -6,7 +6,7 @@ This is the static site for [walk.lc](https://walk.lc). Sister project of [Pilgr
 
 ## Stack
 
-Pure static HTML, CSS, and JS. No build step. Deployed to GitHub Pages from `main`. Email is handled by the [plgrim](https://github.com/walktalkmeditate/plgrim) Cloudflare Worker (separate repo, one worker handles both `circles@plgr.im` and the `walk.lc` flows).
+Pure static HTML, CSS, and JS. No build step. Deployed to GitHub Pages from `main`. Email is handled by a separate Cloudflare Worker (one worker handles both `circles@plgr.im` and the `walk.lc` flows).
 
 ```
 walk.lc/                 → index.html        master seal + manifesto + city grid + start CTA
@@ -168,10 +168,6 @@ Errors to watch for:
 - `walks/<city> action <action> failed` — Listmonk operation failed
 - `walks/<city> broadcast failed` — campaign creation/send failed (SES, Listmonk)
 - `walks/<city> ... reply failed` — Cloudflare reply() rejected (usually inbound auth issue, not load-bearing — Listmonk action already succeeded)
-
-### Sister repo
-
-[`walktalkmeditate/plgrim`](https://github.com/walktalkmeditate/plgrim) — the Cloudflare Worker for email routing. Per-city config lives in `src/walks/config.ts`.
 
 ---
 
