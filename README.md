@@ -181,4 +181,4 @@ The original design doc lives in `~/.claude/plans/ok-so-now-we-magical-swan.md` 
 
 ## License
 
-(TBD)
+MIT — see [LICENSE](LICENSE).
