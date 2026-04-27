@@ -99,6 +99,20 @@ a:hover {
   text-decoration-thickness: 1px;
 }
 
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.city-tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  background: var(--accent-tint);
+  text-decoration: none;
+}
+
 /* ----- Hero (homepage and city pages share these) ----- */
 
 .hero {

@@ -59,7 +59,7 @@
   <main>
 
     <header class="hero">
-      <div class="hero-seal seal-master" data-seal="master"></div>
+      <div class="hero-seal seal-master" data-seal="master" aria-hidden="true"></div>
       <h1>local circle</h1>
       <p class="tagline">walk local</p>
     </header>
@@ -148,6 +148,7 @@
 
           var sealHolder = document.createElement('div');
           sealHolder.className = 'city-tile-seal';
+          sealHolder.setAttribute('aria-hidden', 'true');
           tile.appendChild(sealHolder);
 
           var name = document.createElement('div');

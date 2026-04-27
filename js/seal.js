@@ -166,6 +166,7 @@
     const safeFilter  = esc(filterId);
     const safeTopId   = esc(topId);
     const safeBotId   = esc(botId);
+    const safeAriaLabel = safeTop ? `${safeTop} seal` : 'Local Circle seal';
 
     const botBlock = botText
       ? `<text fill="${INK}" font-family="Lato, system-ui, sans-serif" font-size="9" letter-spacing="6" font-weight="500" opacity="0.7">
@@ -174,7 +175,7 @@
       : '';
 
     return `
-      <svg class="seal-svg" width="100%" height="100%" viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${safeTop} seal">
+      <svg class="seal-svg" width="100%" height="100%" viewBox="0 0 ${SIZE} ${SIZE}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${safeAriaLabel}">
         <defs>
           <filter id="${safeFilter}" x="-10%" y="-10%" width="120%" height="120%">
             <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="3" seed="${seed[31]}"/>

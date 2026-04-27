@@ -50,19 +50,27 @@
     return null;
   }
 
-  function todayInTz(tz, now) {
+  function nowInTz(tz, now) {
     const ref = now || new Date();
     const parts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+      timeZone: tz,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false,
     }).formatToParts(ref);
     const get = (type) => +parts.find((p) => p.type === type).value;
-    return { year: get('year'), month: get('month'), day: get('day') };
+    let hour = get('hour');
+    if (hour === 24) hour = 0;
+    return { year: get('year'), month: get('month'), day: get('day'), hh: hour, mm: get('minute') };
   }
 
-  function isBefore(a, b) {
+  function isStrictlyBefore(a, b) {
     if (a.year !== b.year)   return a.year < b.year;
     if (a.month !== b.month) return a.month < b.month;
     return a.day < b.day;
+  }
+
+  function isSameDay(a, b) {
+    return a.year === b.year && a.month === b.month && a.day === b.day;
   }
 
   function computeNextWalk(cadence, now) {
@@ -72,16 +80,20 @@
     const tz = cadence.tz || 'UTC';
     const [hhStr, mmStr] = (cadence.time || '08:00').split(':');
     const hh = +hhStr, mm = +mmStr;
+    const durationMinutes = +(cadence.durationMinutes || 90);
 
-    const today = todayInTz(tz, now);
+    const current = nowInTz(tz, now);
 
-    let day = nthWeekdayOfMonth(today.year, today.month, parsed.ord, parsed.dow);
-    let candidate = { year: today.year, month: today.month, day };
+    let day = nthWeekdayOfMonth(current.year, current.month, parsed.ord, parsed.dow);
+    let candidate = { year: current.year, month: current.month, day };
 
-    // If candidate already passed (calendar date in event tz), advance to next month.
-    // Same-day stays — the walk is "today" until the calendar flips.
-    if (day == null || isBefore(candidate, today)) {
-      let ny = today.year, nm = today.month + 1;
+    // Advance to next month if the candidate is in the past, OR if the
+    // candidate is today AND the walk's end time has already passed.
+    const walkEndedToday = isSameDay(candidate, current)
+      && (current.hh * 60 + current.mm) >= (hh * 60 + mm + durationMinutes);
+
+    if (day == null || isStrictlyBefore(candidate, current) || walkEndedToday) {
+      let ny = current.year, nm = current.month + 1;
       if (nm > 12) { nm = 1; ny += 1; }
       day = nthWeekdayOfMonth(ny, nm, parsed.ord, parsed.dow);
       candidate = { year: ny, month: nm, day };
@@ -116,20 +128,42 @@
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
+  /* Convert a wall-clock time in the event's timezone to a UTC Date.
+   * Trick: format the same wall-clock as if it were UTC, then compute the
+   * offset that this tz would apply to that fake UTC instant. Works across
+   * DST transitions without per-tz VTIMEZONE blocks. */
+  function localWallToUtc(year, month, day, hh, mm, tz) {
+    const fakeUtcMs = Date.UTC(year, month - 1, day, hh, mm);
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', hour12: false,
+    }).formatToParts(new Date(fakeUtcMs));
+    const get = (type) => +parts.find((p) => p.type === type).value;
+    let hour = get('hour');
+    if (hour === 24) hour = 0;
+    const projectedMs = Date.UTC(get('year'), get('month') - 1, get('day'), hour, get('minute'));
+    const offsetMs = fakeUtcMs - projectedMs;
+    return new Date(fakeUtcMs + offsetMs);
+  }
+
+  function toIcsUtc(date) {
+    return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  }
+
   function buildIcs(walk, eventMeta) {
     const {
       uid, summary, location, description, url,
       durationMinutes = 90,
     } = eventMeta;
 
-    const totalMin = walk.hh * 60 + walk.mm + durationMinutes;
-    const endH = Math.floor(totalMin / 60) % 24;
-    const endM = totalMin % 60;
-
-    const dateStr = `${walk.year}${pad(walk.month)}${pad(walk.day)}`;
-    const dtstart = `${dateStr}T${pad(walk.hh)}${pad(walk.mm)}00`;
-    const dtend   = `${dateStr}T${pad(endH)}${pad(endM)}00`;
-    const dtstamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    /* Emit start/end as UTC instants so any timezone is handled correctly
+     * without maintaining per-tz VTIMEZONE blocks. Calendar apps render the
+     * UTC instant in the user's local time. */
+    const startUtc = localWallToUtc(walk.year, walk.month, walk.day, walk.hh, walk.mm, walk.tz);
+    const endUtc   = new Date(startUtc.getTime() + durationMinutes * 60_000);
+    const dtstart  = toIcsUtc(startUtc);
+    const dtend    = toIcsUtc(endUtc);
+    const dtstamp  = toIcsUtc(new Date());
 
     const escIcs = (s) => String(s || '')
       .replace(/\\/g, '\\\\')
@@ -143,28 +177,11 @@
       'PRODID:-//Local Circle//walk.lc//EN',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
-      'BEGIN:VTIMEZONE',
-      `TZID:${walk.tz}`,
-      'BEGIN:DAYLIGHT',
-      'TZOFFSETFROM:-0600',
-      'TZOFFSETTO:-0500',
-      'TZNAME:CDT',
-      'DTSTART:19700308T020000',
-      'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU',
-      'END:DAYLIGHT',
-      'BEGIN:STANDARD',
-      'TZOFFSETFROM:-0500',
-      'TZOFFSETTO:-0600',
-      'TZNAME:CST',
-      'DTSTART:19701101T020000',
-      'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU',
-      'END:STANDARD',
-      'END:VTIMEZONE',
       'BEGIN:VEVENT',
       `UID:${uid}`,
       `DTSTAMP:${dtstamp}`,
-      `DTSTART;TZID=${walk.tz}:${dtstart}`,
-      `DTEND;TZID=${walk.tz}:${dtend}`,
+      `DTSTART:${dtstart}`,
+      `DTEND:${dtend}`,
       `SUMMARY:${escIcs(summary)}`,
       `LOCATION:${escIcs(location)}`,
       `DESCRIPTION:${escIcs(description)}`,
