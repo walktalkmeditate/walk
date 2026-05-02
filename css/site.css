@@ -635,10 +635,11 @@ footer a {
 
 @media (prefers-color-scheme: dark) {
   .entry-etegami img {
-    border-color: #6E6354;
+    border-color: #B5A78B;
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.45),
-      0 8px 22px rgba(0, 0, 0, 0.55);
+      0 0 0 6px rgba(181, 167, 139, 0.18),
+      0 14px 48px rgba(245, 240, 232, 0.14),
+      0 0 120px rgba(245, 240, 232, 0.10);
   }
 }
 
