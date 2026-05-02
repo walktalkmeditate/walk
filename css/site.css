@@ -419,6 +419,13 @@ button:focus-visible {
   top: -0.05em;
 }
 
+.kit-section .quiet-note {
+  font-size: 14px;
+  color: var(--ink-fog);
+  font-style: italic;
+  margin-top: 1em;
+}
+
 .kit-section .template {
   background: var(--accent-tint);
   border-left: 2px solid var(--accent);
