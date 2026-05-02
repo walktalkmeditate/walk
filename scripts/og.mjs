@@ -2,13 +2,13 @@
 // walk.lc — per-walk OG image generator
 //
 // Reads a walk.json next to a walk's assets, builds a 1200x630 SVG with the
-// etegami subtly faded on the right, the walk's hash seal as a stamp in the
-// bottom-right corner, and the walk's title/stats on the left. Renders with
-// rsvg-convert into og.png next to walk.json.
+// etegami softly faded across the right side and the walk's title/stats on
+// the left. Renders with rsvg-convert into og.png next to walk.json.
 //
 //   node scripts/og.mjs austin/2026-05-02/walk.json
 //
-// Requires: rsvg-convert (brew install librsvg), fonts Cormorant Garamond + Lato.
+// Requires: rsvg-convert (brew install librsvg), magick (brew install
+// imagemagick), fonts Cormorant Garamond + Lato.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -49,7 +49,8 @@ function croppedEtegamiUri(filepath) {
 }
 
 function buildSvg(walk, etegamiUri) {
-  const eyebrow  = (walk.eyebrow || `the ${walk.city.toLowerCase()} circle`).toUpperCase();
+  const cityName = walk.city ? walk.city.toLowerCase() : 'local';
+  const eyebrow  = (walk.eyebrow || `the ${cityName} circle`).toUpperCase();
   const date     = walk.dateLabel;
   const sub      = walk.subtitle || '';
   const caption  = walk.caption || '';
@@ -138,14 +139,25 @@ function main() {
 
   const walkPath = path.resolve(arg);
   const walkDir  = path.dirname(walkPath);
-  const walk     = JSON.parse(fs.readFileSync(walkPath, 'utf8'));
+
+  let walk;
+  try {
+    walk = JSON.parse(fs.readFileSync(walkPath, 'utf8'));
+  } catch (err) {
+    console.error(`could not read ${walkPath}: ${err.message}`);
+    process.exit(1);
+  }
+
+  if (!walk.etegami) {
+    console.error(`${path.basename(walkPath)} is missing required field "etegami"`);
+    process.exit(1);
+  }
 
   const etegami = path.join(walkDir, walk.etegami);
   const out     = path.join(walkDir, 'og.png');
 
   const svg = buildSvg(walk, croppedEtegamiUri(etegami));
 
-  // Optionally write the SVG for inspection if --keep-svg
   if (process.argv.includes('--keep-svg')) {
     fs.writeFileSync(path.join(walkDir, 'og.svg'), svg);
   }
@@ -154,4 +166,9 @@ function main() {
   console.log(`wrote ${path.relative(process.cwd(), out)}`);
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  console.error(err.message);
+  process.exit(1);
+}
