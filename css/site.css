@@ -509,6 +509,211 @@ footer a {
   opacity: 1;
 }
 
+/* ----- Walks archive (city page) ----- */
+
+.walks-archive {
+  margin-top: clamp(56px, 9vh, 88px);
+  padding-top: clamp(32px, 5vh, 48px);
+  border-top: 1px solid var(--rule);
+}
+
+.walks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: clamp(20px, 3vw, 32px);
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.walk-stamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 0.75rem 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.walk-stamp:hover {
+  background: var(--accent-tint);
+  text-decoration: none;
+}
+
+.walk-stamp-seal {
+  width: clamp(96px, 18vw, 124px);
+  height: clamp(96px, 18vw, 124px);
+  display: block;
+  margin: 0 auto 0.75rem;
+  opacity: 0.92;
+}
+
+.walk-stamp-date {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.2em;
+}
+
+.walk-stamp-meta {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-fog);
+}
+
+/* ----- Walk entry page ----- */
+
+.entry-hero {
+  margin-bottom: clamp(32px, 5vh, 48px);
+}
+
+.entry-eyebrow {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.6em;
+}
+
+.entry-seal {
+  display: block;
+  width: clamp(90px, 14vw, 120px);
+  height: auto;
+  margin: 0 auto 1rem;
+  opacity: 0.9;
+}
+
+.entry-hero h1 {
+  font-size: clamp(28px, 5vw, 38px);
+  margin-bottom: 0.2em;
+}
+
+.entry-hero .subtitle {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-fog);
+  margin: 0;
+}
+
+.entry-etegami {
+  margin: clamp(32px, 5vh, 48px) 0;
+  text-align: center;
+}
+
+.entry-etegami img {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  margin: 0 auto;
+  background: #FAF7F0;
+  padding: clamp(8px, 1.4vw, 14px);
+  border: 1px solid var(--rule);
+  box-shadow:
+    0 1px 2px rgba(44, 36, 30, 0.06),
+    0 6px 18px rgba(44, 36, 30, 0.08);
+}
+
+.entry-etegami figcaption {
+  font-style: italic;
+  font-size: clamp(15px, 1.7vw, 17px);
+  color: var(--ink-soft);
+  margin-top: 1em;
+}
+
+.entry-stats {
+  margin: clamp(32px, 5vh, 48px) auto;
+  max-width: 28rem;
+}
+
+.entry-stats dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25em 1em;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .entry-stats dl { grid-template-columns: repeat(2, 1fr); }
+}
+
+.entry-stats dl > div {
+  text-align: center;
+}
+
+.entry-stats dt {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-fog);
+  margin-bottom: 0.4em;
+}
+
+.entry-stats dd {
+  font-family: var(--serif);
+  font-size: clamp(18px, 2.2vw, 22px);
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.entry-caption {
+  font-style: italic;
+  text-align: center;
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: clamp(40px, 6vh, 60px) auto;
+  max-width: 32rem;
+  padding: 0 clamp(16px, 4vw, 32px);
+  border-left: none;
+}
+
+.entry-pilgrim {
+  margin-top: clamp(48px, 7vh, 72px);
+}
+
+.entry-iframe-wrap {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75em;
+}
+
+.entry-iframe-wrap iframe {
+  display: block;
+  width: 100%;
+  height: 600px;
+  border: 0;
+  background: var(--paper-dim);
+}
+
+.entry-pilgrim .quiet {
+  text-align: center;
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-fog);
+}
+
+.entry-pilgrim .quiet a {
+  color: var(--ink-fog);
+}
+
 /* ----- Reduced motion ----- */
 
 @media (prefers-reduced-motion: reduce) {

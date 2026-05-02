@@ -1,0 +1,19 @@
+{
+  "city": "Austin",
+  "citySlug": "austin",
+  "date": "2026-05-02",
+  "dateLabel": "May 2, 2026",
+  "eyebrow": "the austin circle",
+  "subtitle": "the first walk",
+  "caption": "Clear morning — long stretches of silence.",
+  "distance": "2.7 mi",
+  "duration": "1h 3m",
+  "ascent": "91 ft",
+  "steps": "5,836",
+  "weather": "Clear, 12°C",
+  "pilgrims": 4,
+  "etegami": "etegami.jpg",
+  "seal": "seal.png",
+  "pilgrimWalkId": "K28RDf6N_E",
+  "pilgrimUrl": "https://walk.pilgrimapp.org/K28RDf6N_E"
+}
