@@ -36,7 +36,7 @@ Then open `http://127.0.0.1:8000`.
 
 ## Adding a new city — runbook
 
-The first city (Austin) reused the existing `circles` Listmonk list (id 6). City #2 onward needs a fresh Listmonk list. Plan ~30 minutes per city.
+Each new city needs its own Listmonk list (Austin is grandfathered to the legacy `circles` list, id 6). Plan ~30 minutes per city.
 
 ### 1 · Scout the loop
 
@@ -115,8 +115,6 @@ CF dashboard → `walk.lc` zone → Email → Email Routing → Routes → Creat
 
 Generate a 1200×630 PNG to match the existing pattern. Quick path: copy `assets/og/austin.svg`, edit the seal SVG block + headline + tagline, then render via Chrome screenshot at 1200×630 into `assets/og/<slug>.png`.
 
-When the city collection grows past ~3, replace this manual step with a script that renders OGs from `seal.js`.
-
 ### 9 · Push + verify
 
 ```bash
@@ -144,7 +142,7 @@ Then test the email flow end-to-end:
 For sending from `@walk.lc` via SES:
 - Custom MAIL FROM subdomain `mail.walk.lc` with its own SPF (`include:amazonses.com`) and MX (SES feedback)
 - 3 SES DKIM CNAMEs at the root
-- DMARC `p=none` (observation-only — should tighten to `p=quarantine` once SES sending reputation is established, ~2-4 weeks of clean broadcasts)
+- DMARC `p=none` (observation-only)
 
 ### Worker deploy
 
@@ -170,10 +168,6 @@ Errors to watch for:
 - `walks/<city> ... reply failed` — Cloudflare reply() rejected (usually inbound auth issue, not load-bearing — Listmonk action already succeeded)
 
 ---
-
-## Spec / design history
-
-The original design doc lives in `~/.claude/plans/ok-so-now-we-magical-swan.md` (local-only). It covers brand identity, the goshuin seal vocabulary, the email model, and the v1 scope.
 
 ## License
 
